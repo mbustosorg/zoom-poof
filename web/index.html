@@ -1,45 +1,88 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <title>Water Heater Controller</title>
+<html lang="en">
 
-        <style>
-            h1 {
-                font-family: Arial;
-            }
-            p {
-                font-family: Arial;
-            }
-            input[type=button] {
-                border: none;
-                border-radius: 4px;
-                padding: 15px 32px;
-                text-align: center;
-                font-size: 16px;
-                -webkit-appearance: none;
-            }
-            input[type=button]:disabled {
-                background-color: #999999;
-                color: #555555;
-            }
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
 
-            input[type=button]:not([disabled]) {
-                background-color: #009000;
-                color: white;
-            }
-            input[type=button]:not([disabled]):active {
-                background-color: #007000;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Water Heater Controller</h1>
-        <p>Status: <span id="status"></span></p>
+    <title>Zoom Poof</title>
 
-        <input id="activate" type="button" value="Activate" disabled />
-        <input id="deactivate" type="button" value="Dectivate" disabled />
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/floating-labels/">
 
-        <script src="index.js" type="text/javascript"></script>
-    </body>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- Custom styles for this template -->
+    <link href="floating-labels.css" rel="stylesheet">
+    <style>
+        img {
+            border-radius: 20%;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="form-signin" id='submitPoof'>
+        <div class="text-center mb-4">
+            <img class="mb-4 rounded-corners" src="rhb.png" alt="" width="72" height="72">
+            <h1 class="h3 mb-3 font-weight-normal">Zoom Poof</h1>
+            <p>Enter your name, select number of poofs and poof length, submit, enjoy, repeat.</p>
+        </div>
+
+        <div class="form-label-group">
+            <input type="text" id="inputName" class="form-control align-middle" placeholder="Name" required autofocus>
+            <label for="inputName">Name</label>
+        </div>
+        <div class="form-group">
+            <label for="sel1">Poof Count:</label>
+            <select class="form-control" id="poofCount">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="sel1">Poof Length:</label>
+            <select class="form-control" id="poofLength">
+                <option>0.1</option>
+                <option>0.25</option>
+                <option>0.5</option>
+                <option>1</option>
+                <option>2</option>
+            </select>
+        </div>
+        </div>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit" data-toggle="modal" data-target="#exampleModal">Submit</button>
+    
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Zoom Poof</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Request Submitted Successfully
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+    </form>
+
+    <script src="index.js" type="text/javascript"></script>
+</body>
+
 </html>
