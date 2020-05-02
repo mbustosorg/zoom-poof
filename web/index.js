@@ -8,7 +8,7 @@ $('#submitPoof').submit(function () {
     console.log(length);
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/cgi-bin/queue.py?name=' + name + '&count=' + count + '&length=' + length);
+    xhr.open('POST', '/cgi-bin/poof_queue.py?name=' + name + '&count=' + count + '&length=' + length);
     xhr.send();
 
     return false;
