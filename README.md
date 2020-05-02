@@ -1,5 +1,4 @@
-# water-heater
-This is a webapp running on a Raspberry Pi to preheat the water in the house. It uses an HTML page with a simple script to either activate or deactivate the pump which circulates hot water throughout the pipes.
+# zoom-poof
+This is a small web application running on a Raspberry Pi that allows remote control of propane poofing devices.  The interface prompts the user to enter a poofing sequence which is then queued up by the RPi and used to control the propane solenoids.  Additionally, if the video chat is happening on Zoom, a closed captioned message will be displayed to all participants showing who's selection is being played.  We're running this on a Raspberry Pi Zero using standard relays.
 
-## Installation
-Set up the Raspberry Pi as needed, then run `./configure.sh`.
+This project was motivated by a recent Zoom call where I had set up 4 tiki torch poofers and was the only one that could push the button.
