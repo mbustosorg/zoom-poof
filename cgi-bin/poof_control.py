@@ -34,13 +34,21 @@ ZOOM_URL = os.getenv('ZOOM_URL')
 logger.info(ZOOM_URL)
 
 queue = []
-bank1 = LED(17)
-bank2 = LED(27)
+relays = [LED(17), LED(27), LED(23), LED(24)]
 
-def handle_poof(unused_addr, name, count, length):
+
+def display_status(display_range, red, green, blue):
+    """ Update the display """
+    for i in display_range:
+        ledshim.set_pixel(i, red, green, blue)
+    ledshim.show()
+
+    
+def handle_poof(unused_addr, name, count, length, style, timing):
     """ Handle the poof command """
     try:
-        logger.info(f'Received Command - ({name}, {count}, {length})')
+        logger.info(f'Received Command - ({name}, {count}, {length}, {style}, {timing})')
+        queue.append((name, count, length, style, timing))
         with open('seq.txt', 'r') as file:
             seq = int(file.read())
         seq += 1
@@ -50,32 +58,66 @@ def handle_poof(unused_addr, name, count, length):
             file.write(str(seq))
         logger.info(f'Sequence: {seq}')
         logger.info(response)
-        queue.append((name, count, length))
     except ValueError as e:
         logger.error(e)
 
+        
 async def run_command(command):
-    current_milli_time = lambda: int(round(time.time() * 1000))
-    current_command = None
-    current_start = 0
+    """ Run 'command' """
     logger.info(f'Run Command {command}')
-    for i in range(int(command[1])):
-        bank1.on()
-        bank2.on()
-        ledshim.set_all(255, 0, 0)
-        ledshim.show()
-        await asyncio.sleep(float(command[2]))
-        bank1.off()
-        bank2.off()
-        ledshim.set_all(0, 255, 0)
-        ledshim.show()
-        await asyncio.sleep(float(command[2]))
-    ledshim.set_all(0, 0, 255)
-    ledshim.show()
+    timing = float(command[2])
+    count = int(command[1])
+    style = command[3]
+    timing_style = command[4]
+    cylon_index = 0
+    cylon_direction = 1
+    for i in range(count):
+        if 'Full' in style:
+            [x.on() for x in relays]
+            display_status(range(0, 28), 255, 0, 0)
+        elif 'Alternating' in style:
+            relays[0].on()
+            relays[1].on()
+            relays[2].off()
+            relays[3].off()
+            display_status(range(0, 14), 255, 0, 0)
+            display_status(range(14, 28), 0, 255, 0)
+        elif 'Cylon' in style:
+            relays[cylon_index].on()
+            display_status(range(0, 28), 0, 255, 0)
+            display_status(range(cylon_index * 7, (cylon_index + 1) * 7), 255, 0, 0)
+        await asyncio.sleep(timing)
+        if 'Full' in style:
+            [x.off() for x in relays]
+            display_status(range(0, 28), 0, 255, 0)
+        elif 'Alternating' in style:
+            relays[0].off()
+            relays[1].off()
+            relays[2].on()
+            relays[3].on()
+            display_status(range(0, 14), 0, 255, 0)
+            display_status(range(14, 28), 255, 0, 0)
+        elif 'Cylon' in style:
+            [x.off() for x in relays]
+            display_status(range(0, 28), 0, 255, 0)
+        await asyncio.sleep(timing)
+        if 'Accelerating' in timing_style:
+            timing = max(0.0, timing - float(i + 1) / float(count) * timing)
+        if 'Cylon' in style:
+            cylon_index = cylon_index + cylon_direction
+            if cylon_index == 4:
+                cylon_direction = -1
+                cylon_index = 2
+            elif cylon_index == -1:
+                cylon_direction = 1
+                cylon_index = 1
+    [x.off() for x in relays]
+    display_status(range(0, 28), 0, 0, 255)
     logger.info(f'Complete')
     
 
 async def main_loop():
+    """ Main execution loop """
     while True:
         if len(queue) > 0:
             logger.info(f'{len(queue)} commands in the queue')
@@ -83,6 +125,7 @@ async def main_loop():
         await asyncio.sleep(1)
 
 async def init_main(args, dispatcher):
+    """ Initialization routine """
     loop = asyncio.get_event_loop()
     server = AsyncIOOSCUDPServer((args.ip, args.port), dispatcher, loop)
     transport, protocol = await server.create_serve_endpoint()
@@ -97,8 +140,7 @@ if __name__ == "__main__":
     with open('seq.txt', 'w') as file:
         file.write('0')
         
-    ledshim.set_all(0, 0, 255)
-    ledshim.show()
+    display_status(range(0, 28), 0, 0, 255)
     
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", default="10.0.1.39", help="The ip to listen on")
