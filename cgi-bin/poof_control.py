@@ -34,7 +34,7 @@ ZOOM_URL = os.getenv('ZOOM_URL')
 logger.info(ZOOM_URL)
 
 queue = []
-relays = [LED(17), LED(27), LED(23), LED(24)]
+relays = [LED(17, active_high=False), LED(27, active_high=False), LED(24, active_high=False), LED(23, active_high=False)]
 
 
 def display_status(display_range, red, green, blue):
@@ -102,7 +102,7 @@ async def run_command(command):
             display_status(range(0, 28), 0, 255, 0)
         await asyncio.sleep(timing)
         if 'Accelerating' in timing_style:
-            timing = max(0.0, timing - float(i + 1) / float(count) * timing)
+            timing *= 0.5 # max(0.0, timing - float(i + 1) / float(count) * timing)
         if 'Cylon' in style:
             cylon_index = cylon_index + cylon_direction
             if cylon_index == 4:
@@ -140,10 +140,11 @@ if __name__ == "__main__":
     with open('seq.txt', 'w') as file:
         file.write('0')
         
+    [x.off() for x in relays]
     display_status(range(0, 28), 0, 0, 255)
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ip", default="10.0.1.39", help="The ip to listen on")
+    parser.add_argument("--ip", default="10.0.1.32", help="The ip to listen on")
     parser.add_argument("--port", type=int, default=9999, help="The port to listen on")
     args = parser.parse_args()
 

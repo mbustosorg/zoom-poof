@@ -14,7 +14,7 @@
 
 var app = require('express')();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var io = require('socket.io')(http, {cookie: false});
 var port = process.env.PORT || 3000;
 var fs = require('fs');
 var osc = require('osc');
@@ -33,6 +33,10 @@ app.get('/', function(req, res){
 
 app.get('/index.js', function(req, res){
   res.sendFile(__dirname + '/index.js');
+});
+
+app.get('/favicon.ico', function(req, res){
+  res.sendFile(__dirname + '/favicon.ico');
 });
 
 app.get('/floating-labels.css', function(req, res){
@@ -58,7 +62,7 @@ io.on('connection', function(socket){
 		{type: 'f', value: msg['length']},
 		{type: 's', value: msg['style']},
 		{type: 's', value: msg['timing']}
-	    ]}, '10.0.1.39', 9999);
+	    ]}, '10.0.1.32', 9999);
     });
 });
 
