@@ -15,7 +15,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 80;
 var fs = require('fs');
 var osc = require('osc');
 require('log-timestamp');
@@ -33,6 +33,22 @@ app.get('/', function(req, res){
 
 app.get('/index.js', function(req, res){
   res.sendFile(__dirname + '/index.js');
+});
+
+app.get('/support/bootstrap.min.css', function(req, res){
+  res.sendFile(__dirname + '/support/bootstrap.min.css');
+});
+
+app.get('/support/socket.io-1.2.0.js', function(req, res){
+  res.sendFile(__dirname + '/support/socket.io-1.2.0.js');
+});
+
+app.get('/support/jquery-3.4.1.js', function(req, res){
+  res.sendFile(__dirname + '/support/jquery-3.4.1.js');
+});
+
+app.get('/support/bootstrap.min.js', function(req, res){
+  res.sendFile(__dirname + '/support/bootstrap.min.js');
 });
 
 app.get('/floating-labels.css', function(req, res){
@@ -58,7 +74,7 @@ io.on('connection', function(socket){
 		{type: 'f', value: msg['length']},
 		{type: 's', value: msg['style']},
 		{type: 's', value: msg['timing']}
-	    ]}, '10.0.1.39', 9999);
+	    ]}, '192.168.0.101', 9999);
     });
 });
 

@@ -34,7 +34,8 @@ ZOOM_URL = os.getenv('ZOOM_URL')
 logger.info(ZOOM_URL)
 
 queue = []
-relays = [LED(17), LED(27), LED(23), LED(24)]
+
+relays = [LED(17, active_high=False), LED(27, active_high=False), LED(23, active_high=False), LED(24, active_high=False)]
 
 
 def display_status(display_range, red, green, blue):
@@ -52,12 +53,11 @@ def handle_poof(unused_addr, name, count, length, style, timing):
         with open('seq.txt', 'r') as file:
             seq = int(file.read())
         seq += 1
-        response = requests.post(ZOOM_URL + str(seq), data=f'{name} poofed {count} time for {length}s each', headers={'content-type': 'text/plain'})
-        print(ZOOM_URL + str(seq))
-        with open('seq.txt', 'w') as file:
-            file.write(str(seq))
-        logger.info(f'Sequence: {seq}')
-        logger.info(response)
+        #esponse = requests.post(ZOOM_URL + str(seq), data=f'{name} poofed {count} time for {length}s each', headers={'content-type': 'text/plain'})
+        #with open('seq.txt', 'w') as file:
+        #    file.write(str(seq))
+        #logger.info(f'Sequence: {seq}')
+        #logger.info(response)
     except ValueError as e:
         logger.error(e)
 
@@ -118,11 +118,13 @@ async def run_command(command):
 
 async def main_loop():
     """ Main execution loop """
+    [x.off() for x in relays]
     while True:
         if len(queue) > 0:
             logger.info(f'{len(queue)} commands in the queue')
             await asyncio.create_task(run_command(queue.pop(0)))
         await asyncio.sleep(1)
+
 
 async def init_main(args, dispatcher):
     """ Initialization routine """
@@ -141,9 +143,9 @@ if __name__ == "__main__":
         file.write('0')
         
     display_status(range(0, 28), 0, 0, 255)
-    
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ip", default="10.0.1.39", help="The ip to listen on")
+    parser.add_argument("--ip", default="192.168.0.101", help="The ip to listen on")
     parser.add_argument("--port", type=int, default=9999, help="The port to listen on")
     args = parser.parse_args()
 
