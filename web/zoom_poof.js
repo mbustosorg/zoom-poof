@@ -35,6 +35,7 @@ app.get('/index.js', function(req, res){
   res.sendFile(__dirname + '/index.js');
 });
 
+<<<<<<< HEAD
 app.get('/support/bootstrap.min.css', function(req, res){
   res.sendFile(__dirname + '/support/bootstrap.min.css');
 });
@@ -49,6 +50,10 @@ app.get('/support/jquery-3.4.1.js', function(req, res){
 
 app.get('/support/bootstrap.min.js', function(req, res){
   res.sendFile(__dirname + '/support/bootstrap.min.js');
+=======
+app.get('/favicon.ico', function(req, res){
+  res.sendFile(__dirname + '/favicon.ico');
+>>>>>>> 36142242c685edc0c83757c7462898a4b6b9e89e
 });
 
 app.get('/floating-labels.css', function(req, res){
@@ -74,7 +79,11 @@ io.on('connection', function(socket){
 		{type: 'f', value: msg['length']},
 		{type: 's', value: msg['style']},
 		{type: 's', value: msg['timing']}
+<<<<<<< HEAD
 	    ]}, '192.168.0.101', 9999);
+=======
+	    ]}, '10.0.1.32', 9999);
+>>>>>>> 36142242c685edc0c83757c7462898a4b6b9e89e
     });
 });
 

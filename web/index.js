@@ -27,8 +27,6 @@ $('#submitPoof').submit(function (e) {
     command.style = $('#poofStyle')[0].value;
     command.timing = $('#poofTiming')[0].value;
 
-    console.log(command);
-
     socket.emit('poof', command);
 
     return false;
@@ -36,10 +34,10 @@ $('#submitPoof').submit(function (e) {
 
 
 socket.on('poof', function(msg){
-    console.log('broadcast ' + JSON.stringify(msg));
     var time = new Date();
     var hour = time.getHours();
     var minutes = time.getMinutes();
+    if (minutes < 10) minutes = '0' + minutes.toString();
     console.log('broadcast ' + JSON.stringify(msg));
     command = hour + ':' + minutes + ' - ' + msg['name'] + ' poofed ' + msg['count'] + ' times\n';
     $('#queueText')[0].prepend(command);
