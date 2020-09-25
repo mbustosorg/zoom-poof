@@ -35,7 +35,6 @@ app.get('/index.js', function(req, res){
   res.sendFile(__dirname + '/index.js');
 });
 
-<<<<<<< HEAD
 app.get('/support/bootstrap.min.css', function(req, res){
   res.sendFile(__dirname + '/support/bootstrap.min.css');
 });
@@ -48,23 +47,23 @@ app.get('/support/jquery-3.4.1.js', function(req, res){
   res.sendFile(__dirname + '/support/jquery-3.4.1.js');
 });
 
-app.get('/support/bootstrap.min.js', function(req, res){
-  res.sendFile(__dirname + '/support/bootstrap.min.js');
-=======
-app.get('/favicon.ico', function(req, res){
-  res.sendFile(__dirname + '/favicon.ico');
->>>>>>> 36142242c685edc0c83757c7462898a4b6b9e89e
+app.get('/support/bootstrap.min.js', function(req, res) {
+    res.sendFile(__dirname + '/support/bootstrap.min.js');
 });
 
-app.get('/floating-labels.css', function(req, res){
+app.get('/support/favicon.ico', function(req, res){
+  res.sendFile(__dirname + '/support/favicon.ico');
+});
+
+app.get('/support/floating-labels.css', function(req, res){
     res.writeHead(200, {'Content-type' : 'text/css'});
-    var fileContents = fs.readFileSync(__dirname + '/floating-labels.css', {encoding: 'utf8'});
+    var fileContents = fs.readFileSync(__dirname + '/support/floating-labels.css', {encoding: 'utf8'});
     res.write(fileContents);
     res.end();
 });
 
-app.get('/rhb.png', function(req, res){
-  res.sendFile(__dirname + '/rhb.png');
+app.get('/support/rhb.png', function(req, res){
+    res.sendFile(__dirname + '/support/rhb.png');
 });
 
 io.on('connection', function(socket){

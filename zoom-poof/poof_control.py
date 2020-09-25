@@ -23,7 +23,7 @@ from pythonosc.osc_server import AsyncIOOSCUDPServer
 from pythonosc.dispatcher import Dispatcher
 import asyncio
 import ledshim
-from gpiozero import LED
+from gpiozero import LED, Button
 
 FORMAT = '%(asctime)-15s %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -35,6 +35,7 @@ logger.info(ZOOM_URL)
 
 queue = []
 relays = [LED(17, active_high=False), LED(27, active_high=False), LED(23, active_high=False), LED(24, active_high=False)]
+remotes = [Button(16, pull_up=False), Button(20, pull_up=False), Button(21, pull_up=False), Button(26, pull_up=False)]
 
 
 def display_status(display_range, red, green, blue):
@@ -123,6 +124,14 @@ async def main_loop():
             logger.info(f'{len(queue)} commands in the queue')
             await asyncio.create_task(run_command(queue.pop(0)))
         await asyncio.sleep(1)
+        if remotes[0].is_pressed:
+            handle_poof(None, 'remote', 10, 1.0, 'Full', 'Accelerating')
+        elif remotes[1].is_pressed:
+            handle_poof(None, 'remote', 10, 2.0, 'Cylon', 'Accelerating')
+        elif remotes[2].is_pressed:
+            handle_poof(None, 'remote', 10, 3.0, 'Alternating', 'Accelerating')
+        elif remotes[3].is_pressed:
+            handle_poof(None, 'remote', 10, 3.0, 'Cylon', 'Accelerating')
 
 
 async def init_main(args, dispatcher):
