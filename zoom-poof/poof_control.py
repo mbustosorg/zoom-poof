@@ -19,6 +19,8 @@ import os
 import requests
 import time
 
+from pythonosc import osc_message_builder
+from pythonosc import udp_client
 from pythonosc.osc_server import AsyncIOOSCUDPServer
 from pythonosc.dispatcher import Dispatcher
 import asyncio
@@ -27,22 +29,23 @@ from gpiozero import LED, Button
 
 FORMAT = '%(asctime)-15s %(message)s'
 logging.basicConfig(format=FORMAT)
-logger = logging.getLogger('IMU')
+logger = logging.getLogger('POOF')
 logger.setLevel(logging.INFO)
 
 ZOOM_URL = os.getenv('ZOOM_URL')
-logger.info(ZOOM_URL)
+logger.info(f'ZOOM_URL={ZOOM_URL}')
 
 queue = []
 relays = [LED(17, active_high=False), LED(27, active_high=False), LED(23, active_high=False), LED(24, active_high=False)]
-remotes = [Button(16, pull_up=False), Button(20, pull_up=False), Button(21, pull_up=False), Button(26, pull_up=False)]
+remotes = [Button(16), Button(20), Button(21), Button(26)]
+led_play = None
 
 
 def display_status(display_range, red, green, blue):
     """ Update the display """
-    for i in display_range:
-        ledshim.set_pixel(i, red, green, blue)
-    ledshim.show()
+    #for i in display_range:
+    #    ledshim.set_pixel(i, red, green, blue)
+    #ledshim.show()
 
     
 def handle_poof(unused_addr, name, count, length, style, timing):
@@ -90,6 +93,7 @@ async def run_command(command):
         if 'Full' in style:
             [x.off() for x in relays]
             display_status(range(0, 28), 0, 255, 0)
+            await asyncio.sleep(timing)
         elif 'Alternating' in style:
             relays[0].off()
             relays[1].off()
@@ -97,12 +101,12 @@ async def run_command(command):
             relays[3].on()
             display_status(range(0, 14), 0, 255, 0)
             display_status(range(14, 28), 255, 0, 0)
+            await asyncio.sleep(timing)
         elif 'Cylon' in style:
             [x.off() for x in relays]
             display_status(range(0, 28), 0, 255, 0)
-        await asyncio.sleep(timing)
         if 'Accelerating' in timing_style:
-            timing *= 0.5 # max(0.0, timing - float(i + 1) / float(count) * timing)
+            timing = max(0.5, timing - float(i + 1) / float(count) * timing)
         if 'Cylon' in style:
             cylon_index = cylon_index + cylon_direction
             if cylon_index == 4:
@@ -123,15 +127,24 @@ async def main_loop():
         if len(queue) > 0:
             logger.info(f'{len(queue)} commands in the queue')
             await asyncio.create_task(run_command(queue.pop(0)))
-        await asyncio.sleep(1)
-        if remotes[0].is_pressed:
-            handle_poof(None, 'remote', 10, 1.0, 'Full', 'Accelerating')
-        elif remotes[1].is_pressed:
-            handle_poof(None, 'remote', 10, 2.0, 'Cylon', 'Accelerating')
-        elif remotes[2].is_pressed:
-            handle_poof(None, 'remote', 10, 3.0, 'Alternating', 'Accelerating')
-        elif remotes[3].is_pressed:
-            handle_poof(None, 'remote', 10, 3.0, 'Cylon', 'Accelerating')
+        await asyncio.sleep(0.1)
+        for i in range(0, 4):
+            if not remotes[i].is_pressed and relays[i].is_lit:
+                logger.info(f'Remote off {i}')
+                msg = osc_message_builder.OscMessageBuilder(address='/color')
+                msg.add_arg(255)
+                msg.add_arg(0)
+                msg.add_arg(0)
+                led_play.send(msg.build())
+                relays[i].off()
+            elif remotes[i].is_pressed and not relays[i].is_lit:
+                logger.info(f'Remote on {i}')
+                msg = osc_message_builder.OscMessageBuilder(address='/color')
+                msg.add_arg(0)
+                msg.add_arg(255)
+                msg.add_arg(0)
+                led_play.send(msg.build())
+                relays[i].on()
 
 
 async def init_main(args, dispatcher):
@@ -147,8 +160,8 @@ async def init_main(args, dispatcher):
 
 if __name__ == "__main__":
 
-    with open('seq.txt', 'w') as file:
-        file.write('0')
+#    with open('seq.txt', 'w') as file:
+#        file.write('0')
         
     [x.off() for x in relays]
     display_status(range(0, 28), 0, 0, 255)
@@ -156,7 +169,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", default="192.168.0.101", help="The ip to listen on")
     parser.add_argument("--port", type=int, default=9999, help="The port to listen on")
+    parser.add_argument("--color_ip", default="192.168.0.101", help="IP for color server")
+    parser.add_argument("--color_port", type=int, default=9997, help="Port for color server")
     args = parser.parse_args()
+
+    led_play = udp_client.UDPClient(args.color_ip, args.color_port)
 
     dispatcher = Dispatcher()
     dispatcher.map("/poof", handle_poof)
