@@ -21,7 +21,7 @@ from pythonosc.osc_server import AsyncIOOSCUDPServer
 from rpi_ws281x import *
 
 # LED strip configuration:
-LED_COUNT      = 8       # Number of LED pixels.
+LED_COUNT      = 24      # Number of LED pixels.
 LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
@@ -38,7 +38,7 @@ strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, 
 strip.begin()
 
 
-def color_wipe(unused_addr, red, green, blue, wait_ms=50):
+def color_wipe(unused_addr, red, green, blue, wait_ms=3):
     """Wipe color across display a pixel at a time."""
     logger.info(f'Color {red} {green} {blue}')
     color = Color(red, green, blue)
@@ -50,6 +50,7 @@ def color_wipe(unused_addr, red, green, blue, wait_ms=50):
 
 async def main_loop():
     """ Main execution loop """
+    color_wipe(None, 100, 0, 0)
     while True:
         await asyncio.sleep(0.1)
 
@@ -67,7 +68,7 @@ async def init_main(args, dispatcher):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ip", default="192.168.0.101", help="The ip to listen on")
+    parser.add_argument("--ip", default="192.168.0.100", help="The ip to listen on")
     parser.add_argument("--port", type=int, default=9997, help="The port to listen on")
     args = parser.parse_args()
 

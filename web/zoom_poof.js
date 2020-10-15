@@ -78,11 +78,7 @@ io.on('connection', function(socket){
 		{type: 'f', value: msg['length']},
 		{type: 's', value: msg['style']},
 		{type: 's', value: msg['timing']}
-<<<<<<< HEAD
-	    ]}, '192.168.0.101', 9999);
-=======
-	    ]}, '10.0.1.32', 9999);
->>>>>>> 36142242c685edc0c83757c7462898a4b6b9e89e
+        ]}, '192.168.0.100', 9999);
     });
 });
 
